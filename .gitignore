@@ -1,0 +1,16 @@
+# System files
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# OS-specific metadata
+*Zone.Identifier
+
+# Output files
+*.pdf
+*.html
+*.json
+*.txt
+
+# Data files
+data/

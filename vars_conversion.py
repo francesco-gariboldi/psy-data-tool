@@ -20,10 +20,11 @@ def load_yprofiling_report():
               "it is located in the same folder as this script.")
     except JSONDecodeError:
         print("This is not a valid JSON document.")
-    return none
+    return None
 
 
-# Return a dictionary with variables and relative dtype according to ydata-profiling.
+# Return a dictionary with variables and relative dtype according to
+# ydata-profiling.
 def build_dtypes_dict(data_profile):
     dtypes_dict = {}
     
@@ -35,53 +36,45 @@ def build_dtypes_dict(data_profile):
     else:
         print("Failed to load the data profile.")
 
-
-def convert_dtypes(df, report_dtypes):
+# "convert_dtypes" is a pandas function, don't use that name or it will
+# mask the internal function.
+def convert_datatypes(df, report_dtypes):
     # Standardize keys of the report_dtypes dictionary
-    report_dtypes = {
+    standardized_report_dtypes = {
         key.strip().lower().replace(' ', '_').replace('(', '').replace(')', ''): value
         for key, value in report_dtypes.items()
     }
     '''Converts the cleaned pandas.DataFrame dtypes based on a custom mapping'''
-    # Define the mapping from custom dtype strings to actual pandas/numpy dtypes
+    # Define the mapping from custom dtype strings to actual pandas/numpy dtypes.
+    # Currently, ydata-profiling recognizes the following types: Boolean,
+    # Numerical (actually in the report it's called 'Numeric'), Date, Datetime,
+    # Categorical, Time-series, URL, Path, File, Image.
     dtype_mapping = {
+        'Boolean': 'bool',
         'Numeric': 'float64',
+        'Date': 'datetime64[ns]',
+        'DateTime': 'datetime64[ns]',
         'Categorical': 'category',
-        'Text': 'object'
+        'Time-series': 'datetime64[ns]',
+        'Text': 'object',
+        'URL': 'object',
+        'Path': 'object',
+        'File': 'object',
+        'Image': 'object'
     }
 
-    # Iterate over the dtype dictionary and convert columns
-    for column, dtype in report_dtypes.items():
+    # Iterate over the dtype_mapping dictionary and convert columns
+    for var_name in standardized_report_dtypes.keys():
         try:
-            if column in df.columns:
-                if dtype in dtype_mapping:
-                    if dtype_mapping[dtype] == 'category':
-                        df[column] = df[column].astype('category')
-                    else:
-                        df[column] = pd.to_numeric(df[column], errors='coerce') if dtype == 'Numeric' else df[column].astype(dtype_mapping[dtype])
-                else:
-                    raise ValueError(f"Unknown dtype: {dtype}")
+            if var_name in df.columns:
+                df[var_name] = df[var_name].astype(dtype_mapping[standardized_report_dtypes[var_name]])
             else:
-                raise KeyError(f"Column {column} not found in DataFrame")
+                raise KeyError(f"Column {var_name} not found in DataFrame, probably removed during cleaning.")
         except KeyError as e:
             print(e)
             continue
 
     return df
-
-
-# Function to convert all categorical columns to strings without modifying
-# the original DataFrame. This is for compatibility with R's data types
-# and creation of the R database equivalent for the Python dataframe.
-# In contrast to R's factor function, categorical data is not converting
-# input values to strings; categories will end up the same data type as
-# the original values. In contrast to R's factor function, there is
-# currently no way to assign/change labels at creation time.
-def convert_categoricals_to_strings(df):
-    df_r = df.copy()  # Create a copy of the original DataFrame
-    for col in df_r.select_dtypes(include=['category']).columns:
-        df_r[col] = df_r[col].astype(str)  # Convert categorical columns to strings
-    return df_r
 
 
 # A simple ascii chart representing only the changed vars

@@ -2,6 +2,11 @@
 import os
 import rpy2
 import pandas as pd
+from IPython.display import display, Image
+
+# Set env variable R_HOME through python. Change the path according to your platform/OS
+# and your filesystem.
+os.environ['R_HOME'] = '/usr/lib/R'
 
 # Loading R packages
 graphics = rpy2.robjects.packages.importr('graphics') # Equivalent to "library(graphics)"
@@ -9,11 +14,14 @@ lme4 = rpy2.robjects.packages.importr('lme4')
 lmerTest = rpy2.robjects.packages.importr('lmerTest')
 performance = rpy2.robjects.packages.importr('performance')
 graphics = rpy2.robjects.packages.importr('graphics')
+ggplot2 = rpy2.robjects.packages.importr('ggplot2')
+gglm = rpy2.robjects.packages.importr('gglm')
+gridExtra = rpy2.robjects.packages.importr('gridExtra')
 
 # Importing my modules
 from data_cleaner import clean_dataframe
 import ydata_profiling_generator
-from vars_conversion import load_yprofiling_report, build_dtypes_dict, convert_dtypes, represent_dtype_changelog, convert_categoricals_to_strings
+from vars_conversion import load_yprofiling_report, build_dtypes_dict, convert_datatypes, represent_dtype_changelog
 from print_models_amount import models_amount_msg
 import models_generator
 import models_features
@@ -47,14 +55,14 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
     original_dtypes = df.dtypes
 
     # Convert the DataFrame dtypes
-    df = convert_dtypes(df, report_dtypes)
+    df = convert_datatypes(df, report_dtypes)
     represent_dtype_changelog(df, original_dtypes)
 
     # Activate pandas to R conversion
     rpy2.robjects.pandas2ri.activate()
 
-    # Convert categorical dtypes to strings for R compatibility
-    df_r = convert_categoricals_to_strings(df)
+    # Create Python df copy dataframe to be converted to R's dataframe
+    df_r = df
 
     # Transfer the DataFrame to R
     # The pandas2ri.py2ri function support the reverse operation to convert DataFrames
@@ -67,6 +75,8 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
 
     # Generate model formulas based on the response and predictor variables
     model_formulas = models_generator.generate_all_models(df, response_var, predictor_vars)
+
+    # Output generated models amount
     models_amount_msg(model_formulas)
 
     # Compute evaluation indexes
@@ -80,7 +90,7 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
         r_warnings.print_r_warnings()
 
     # Plot diagnostics for the best models
-    r_graphics.plot_best_models_diagnostics(best_models, df_r)
+    r_graphics.plot_best_models_diagnostics_ggplot2(best_models, df_r)
     
     # Print R warnings again if print_warnings is True
     if print_r_warnings:

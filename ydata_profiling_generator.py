@@ -10,7 +10,14 @@ from ydata_profiling import ProfileReport
 def generate_profiling_report(df):
     # Use pathlib to create a path object that is OS-independent
     report_dir = Path(__file__).parent  # This gives the directory where the script is stored
-    profile = ProfileReport(df, title="Profiling Report", explorative=True)
+    # Generate the profiling report with adjusted settings
+    profile = ProfileReport(
+        df, 
+        title="Profiling Report", 
+        explorative=True, 
+        correlations={"auto": {"calculate": False}}, 
+        missing_diagrams={"Heatmap": False}  # Avoid generating the Heatmap
+    )
     # Save the report files in the same directory as the script
     profile.to_file(report_dir / "your_report.html")
     profile.to_file(report_dir / "your_report.json")

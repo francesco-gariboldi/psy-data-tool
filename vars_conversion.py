@@ -36,6 +36,7 @@ def build_dtypes_dict(data_profile):
     else:
         print("Failed to load the data profile.")
 
+
 # "convert_dtypes" is a pandas function, don't use that name or it will
 # mask the internal function.
 def convert_datatypes(df, report_dtypes):
@@ -75,6 +76,42 @@ def convert_datatypes(df, report_dtypes):
             continue
 
     return df
+
+
+# Create Python df copy dataframe to be converted to R's dataframe
+# Before creation of the df_r copy of the Pandas df DataFrame, an
+# attempt to convert object Categorical variables to string was made.
+# Categorical must be made. The conversion of Categorical to string
+# is necessary to avoid the error UserWarning: Error while trying to
+# convert the column "chronotype". Fall back to string conversion.
+# The error is: Converting pandas "Category" series to R factor is
+# only possible when categories are strings. 
+# Convert Pandas "Category" series to strings.
+def adapt_r(df):
+    """
+    Ensure categorical columns in a Pandas DataFrame have string categories.
+    This allows for correct conversion to R's DataFrame where these columns 
+    will be treated as factors.
+
+    Parameters:
+    df (pd.DataFrame): The input Pandas DataFrame.
+
+    Returns:
+    pd.DataFrame: A DataFrame where categorical columns have string categories.
+    """
+    try:
+        # Create a deep copy of the DataFrame to avoid modifying the original
+        df_r = df.copy()
+
+        # Convert the categories of all categorical columns to strings
+        for column in df_r.select_dtypes(include='category'):
+            df_r[column] = df_r[column].cat.rename_categories(str)
+        
+    except Exception as e:
+        print(f"An error occurred during conversion: {e}")
+        return None
+
+    return df_r
 
 
 # A simple ascii chart representing only the changed vars

@@ -21,13 +21,14 @@ gridExtra = rpy2.robjects.packages.importr('gridExtra')
 # Importing my modules
 from data_cleaner import clean_dataframe
 import ydata_profiling_generator
-from vars_conversion import load_yprofiling_report, build_dtypes_dict, convert_datatypes, represent_dtype_changelog
+from vars_conversion import load_yprofiling_report, build_dtypes_dict, convert_datatypes, represent_dtype_changelog, adapt_r
 from print_models_amount import models_amount_msg
 import models_generator
 import models_features
 import models_comparison
 import r_warnings
 import r_graphics
+import r_models
 
 
 # A function to automate models generation, models performances
@@ -61,8 +62,8 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
     # Activate pandas to R conversion
     rpy2.robjects.pandas2ri.activate()
 
-    # Create Python df copy dataframe to be converted to R's dataframe
-    df_r = df
+    # Adapt the DataFrame to be converted to R's dataframe
+    df_r = adapt_r(df)
 
     # Transfer the DataFrame to R
     # The pandas2ri.py2ri function support the reverse operation to convert DataFrames
@@ -78,7 +79,14 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
 
     # Output generated models amount
     models_amount_msg(model_formulas)
+    
+    # Output generated models amount
+    for model in model_formulas:
+        print(f"{model}\n")
 
+    # Print the R dataframe structure after conversion 
+    rpy2.robjects.r("str(df_r)")
+    
     # Compute evaluation indexes
     evaluation_results = models_features.compute_models_indexes(df, model_formulas)
 
@@ -95,3 +103,12 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
     # Print R warnings again if print_warnings is True
     if print_r_warnings:
         r_warnings.print_r_warnings()
+
+    # Best non-mixed model performances
+    r_models.best_non_mixed_model_performances(best_models, df_r, response_var, predictor_vars)
+
+    # Best mixed model performances
+    r_models.mixed_best_model_performances(best_models, df_r, response_var, predictor_vars, cat_predictor_var = None)
+
+    # Return response variable and predictor variables
+    return response_var, predictor_vars, best_models, df_r

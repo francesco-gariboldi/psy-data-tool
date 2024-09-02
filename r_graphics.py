@@ -1,6 +1,7 @@
 import os
 import rpy2
 import r_warnings
+from IPython.display import display
 import IPython
 
 
@@ -155,7 +156,7 @@ def plot_best_models_diagnostics_gglm(best_models, df_r):
 def plot_best_models_diagnostics_ggplot2(best_models, df_r):
     # Start by opening a PDF file
     r_code = """
-    pdf(file="./rplots.pdf", width = 7, height = 56)
+    pdf(file="./rplots.pdf", width = 10, height = 35)
     """
     
     # Plot for non-mixed model if available
@@ -281,6 +282,165 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
 
         # Verify that the PDF was created
         pdf_path = './rplots.pdf'
+        if os.path.exists(pdf_path):
+            print(f"PDF generated successfully: {pdf_path}")
+            
+            # Display the PDF file in the Jupyter notebook
+            display(IPython.display.IFrame(pdf_path, width=800, height=600))
+        else:
+            print("PDF file was not generated.")
+
+    except Exception as e:
+        print("Error encountered while generating plots:", e)
+        r_warnings.print_r_warnings()
+
+
+# Mixed model ggplot2()
+def plot_mixed_model_ggplot2(best_models, df_r, response_var, predictor_vars, cat_predictor_var=None):
+    if cat_predictor_var is None:
+        cat_predictor_var = predictor_vars[-1]
+
+    # Start by opening a PDF file
+    r_code = """
+    library(ggplot2)
+    library(lme4)
+    library(gridExtra)
+    
+    pdf(file="./mixed_model_plot.pdf", width = 10, height = 35)
+    """
+    
+    if best_models.get('mixed_best_model'):
+        mixed_formula = best_models['mixed_best_model']['formula']
+        r_mixed_formula = rpy2.robjects.StrVector([mixed_formula])
+        rpy2.robjects.globalenv['mixed_formula'] = r_mixed_formula[0]
+        print(f"Mixed model formula: {mixed_formula}")
+
+        # Run the R code
+        r_code += f"""
+        # Fit the mixed model
+        mixed_model <- lmer(mixed_formula, data=df_r)
+
+        # Extract the data for plotting
+        plot_data <- data.frame(
+            fitted = fitted(mixed_model),
+            resid = resid(mixed_model),
+            leverage = hatvalues(mixed_model),
+            {cat_predictor_var} = df_r${cat_predictor_var}
+        )
+
+        # Create plots
+        plot1 <- ggplot(mixed_model,
+                aes(resilience_scale, .resid, colour = factor(psychological_disease))) +
+                geom_point() + geom_smooth()
+
+        plot2 <- check_model( mixed_model )
+
+        plot3 <- ggplot(plot_data, aes(x=fitted, y=sqrt(abs(resid)))) +
+                    geom_point() +
+                    labs(title = "Scale-Location", x = "Fitted values", y = "√|Residuals|") +
+                    theme_minimal()
+
+        plot4 <- ggplot(plot_data, aes(x=leverage, y=resid)) +
+                    geom_point() +
+                    labs(title = "Residuals vs Leverage", x = "Leverage", y = "Residuals") +
+                    theme_minimal()
+
+        # Arrange the plots in a grid
+        grid.arrange(plot1, plot2, plot3, plot4, ncol=1)
+        """
+    else:
+        print("Mixed best model is missing or invalid.")
+    
+    r_code += """
+    dev.off()
+    """
+    
+    try:
+        # Execute the R code to generate the PDF
+        rpy2.robjects.r(r_code)
+
+        # Verify that the PDF was created
+        pdf_path = './mixed_model_plot.pdf'
+        if os.path.exists(pdf_path):
+            print(f"PDF generated successfully: {pdf_path}")
+            
+            # Display the PDF file in the Jupyter notebook
+            display(IPython.display.IFrame(pdf_path, width=800, height=600))
+        else:
+            print("PDF file was not generated.")
+
+    except Exception as e:
+        print("Error encountered while generating plots:", e)
+        r_warnings.print_r_warnings()
+
+
+# Mixed model ggplot2()
+def plot_mixed_model_ggplot2(best_models, df_r, response_var, predictor_vars, cat_predictor_var=None):
+    if cat_predictor_var is None:
+        cat_predictor_var = predictor_vars[-1]
+
+    # Start by opening a PDF file
+    r_code = """
+    library(ggplot2)
+    library(lme4)
+    library(gridExtra)
+    
+    pdf(file="./check_mixed_model_plot.pdf", width = 10, height = 35)
+    """
+    
+    if best_models.get('mixed_best_model'):
+        mixed_formula = best_models['mixed_best_model']['formula']
+        r_mixed_formula = rpy2.robjects.StrVector([mixed_formula])
+        rpy2.robjects.globalenv['mixed_formula'] = r_mixed_formula[0]
+        print(f"Mixed model formula: {mixed_formula}")
+
+        # Run the R code
+        r_code += f"""
+        # Fit the mixed model
+        mixed_model <- lmer(mixed_formula, data=df_r)
+
+        # Extract the data for plotting
+        plot_data <- data.frame(
+            fitted = fitted(mixed_model),
+            resid = resid(mixed_model),
+            leverage = hatvalues(mixed_model),
+            {cat_predictor_var} = df_r${cat_predictor_var}
+        )
+
+        # Simulate new response values from the model
+        sim_data <- simulate(mixed_model, nsim = 50)
+        sim_df <- as.data.frame(sim_data)
+
+        # Explicitly create the 'ind' column
+        Y <- stack(sim_df)
+        Y$ind <- rep(1:50, each = nrow(sim_df))  # Ensure 'ind' is properly assigned
+
+        # Check the structure of Y to ensure 'ind' exists
+        print(head(Y))
+
+
+        # Create simulations plot
+        plot1 <- ggplot(Y, aes(x = values, group = ind)) +
+                geom_density(color = "lightblue") +
+                geom_density(data = plot_data, aes(x = resid), color = "red") +
+                theme_bw()
+
+        # Arrange the plots in a grid
+        grid.arrange(plot1, ncol=1)
+        """
+    else:
+        print("Mixed best model is missing or invalid.")
+    
+    r_code += """
+    dev.off()
+    """
+    
+    try:
+        # Execute the R code to generate the PDF
+        rpy2.robjects.r(r_code)
+
+        # Verify that the PDF was created
+        pdf_path = './check_mixed_model_plot.pdf'
         if os.path.exists(pdf_path):
             print(f"PDF generated successfully: {pdf_path}")
             

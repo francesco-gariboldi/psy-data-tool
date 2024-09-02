@@ -47,10 +47,7 @@ def compute_models_indexes(df, model_formulas, batch_size=10, output_file = os.p
                             # Extract relevant metrics from the lmer model
                             aic = rpy2.robjects.r['AIC'](lmer_fit)[0]
                             bic = rpy2.robjects.r['BIC'](lmer_fit)[0]
-    
-                            # Packages/functions: See performance::r2(), MuMIn::r.squaredGLMM()
-                            # The r2glmm package computes partial R2 values for fixed effects (only for
-                            # lmer, lme, and glmmPQL models).
+
                             r2_values = rpy2.robjects.r['r2'](lmer_fit)
                             marginal_r_squared = r2_values[0]
                             conditional_r_squared = r2_values[1]
@@ -66,7 +63,7 @@ def compute_models_indexes(df, model_formulas, batch_size=10, output_file = os.p
                             mixed_results.append(result)
                             
                         except rpy2.rinterface_lib.embedded.RRuntimeError as e:
-                            print(f"Skipping model '{formula}' due to an error during dummy fitting: {e}")
+                            print(f"Skipping model '{formula}' due to an error during fitting: {e}")
                     else:                    
                         # Fit the model using Python's statsmodels
                         model = smf.ols(formula=formula, data=df).fit()

@@ -56,7 +56,9 @@ def clean_dataframe(df):
     df = df.dropna()
     
     # 5. Standardize column names (to lower cased snake_case)
-    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('(', '').str.replace(')', '')
+    # Also remove '%' from column names
+    # Remove ending '_' from column names
+    df.columns = df.columns.str.replace('%', '').str.replace('(', '').str.replace(')', '').str.strip().str.lower().str.replace(' ', '_')
     # df.columns = df.columns.str.strip().str.lower().str.replace('[ ()]', '', regex=True)   this is a better way to do it with regex (more concise)
     
     cleaned_df = df

@@ -42,7 +42,7 @@ def build_dtypes_dict(data_profile):
 def convert_datatypes(df, report_dtypes):
     # Standardize keys of the report_dtypes dictionary
     standardized_report_dtypes = {
-        key.strip().lower().replace(' ', '_').replace('(', '').replace(')', ''): value
+        key.replace('%', '').replace('(', '').replace(')', '').strip().lower().replace(' ', '_'): value
         for key, value in report_dtypes.items()
     }
     '''Converts the cleaned pandas.DataFrame dtypes based on a custom mapping'''

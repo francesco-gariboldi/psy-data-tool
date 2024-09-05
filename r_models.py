@@ -11,14 +11,11 @@ def best_non_mixed_model_performances(best_models, df_r, response_var, predictor
         non_mixed_formula = best_models['non_mixed_best_model']['formula']
         r_non_mixed_formula = rpy2.robjects.StrVector([non_mixed_formula])
         rpy2.robjects.globalenv['non_mixed_formula'] = r_non_mixed_formula[0] 
-        print(f"\nNon-mixed model formula: {non_mixed_formula}")
+        print("\n\n------------------------------------------------------------------")
+        print(f"\nNon-mixed model formula: {non_mixed_formula}\n")
 
         # Fit the non-mixed model
-        non_mixed_model = rpy2.robjects.r(f"lm({non_mixed_formula}, data=df_r)")
-
-        # Print the non-mixed model variables
-        print(f"\nResponse variable: {response_var}")
-        print(f"Predictor variables: {predictor_vars}\n")    
+        non_mixed_model = rpy2.robjects.r(f"lm({non_mixed_formula}, data=df_r)")   
 
         # Print the summary of the non-mixed model
         summary = rpy2.robjects.r(f"summary(non_mixed_model)")
@@ -30,7 +27,7 @@ def best_non_mixed_model_performances(best_models, df_r, response_var, predictor
         # Print the performances
         print(performances)
     else:
-        print("Non-mixed best model is missing or invalid.")
+        print("\n\nNon-mixed best model is missing or invalid.\n\n")
 
 
 
@@ -44,15 +41,11 @@ def mixed_best_model_performances(best_models, df_r, response_var, predictor_var
         rpy2.robjects.globalenv['mixed_formula'] = r_mixed_formula[0]
         
         # Print the mixed model formula
-        print("\n------------------------------------------------------------------")
-        print(f"\nMixed model formula: {mixed_formula}")
+        print("\n\n------------------------------------------------------------------")
+        print(f"\nMixed model formula: {mixed_formula}\n")
 
         # Fit the mixed model
         mixed_model = rpy2.robjects.r(f"lmer({mixed_formula}, data=df_r)")
-
-        # Print the mixed model variables
-        print(f"\nResponse variable: {response_var}")
-        print(f"Predictor variables: {predictor_vars}\n")
 
         # Print the summary of the non-mixed model
         summary = rpy2.robjects.r(f"summary(mixed_model)")
@@ -72,4 +65,4 @@ def mixed_best_model_performances(best_models, df_r, response_var, predictor_var
         random_effects = rpy2.robjects.r(f"ranef(mixed_model)")
         print(f"Random effects: {random_effects}\n")
     else:
-        print("Mixed best model is missing or invalid.")
+        print("\n\nMixed best model is missing or invalid.\n\n")

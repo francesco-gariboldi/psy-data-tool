@@ -110,5 +110,8 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
     # Best mixed model performances
     r_models.mixed_best_model_performances(best_models, df_r, response_var, predictor_vars, cat_predictor_var = None)
 
+    # Scatterplots of the effects of the best models
+    r_graphics.dynamic_scatterplot(df_r, response_var, predictor_vars)
+
     # Return response variable and predictor variables
     return response_var, predictor_vars, best_models, df_r

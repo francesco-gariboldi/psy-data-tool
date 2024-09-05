@@ -1,10 +1,14 @@
 import pandas as pd
 from itertools import combinations, chain
 
+
+# Null models formulas
 def generate_null_models(response_var):
     models = [f"{response_var} ~ 1"]
     return models
 
+
+# Simple and additional models formulas
 def generate_simple_and_additional_models(df, response_var, predictor_vars):
     """
     Generate all possible simple and additional model formulas (R/Patsy-style)
@@ -42,6 +46,7 @@ def generate_simple_and_additional_models(df, response_var, predictor_vars):
     return models
 
 
+# Interaction models formulas
 def generate_interaction_models(df, response_var, predictor_vars):
     """
     Generate all possible interaction model formulas (R/Patsy-style)
@@ -90,6 +95,7 @@ def generate_interaction_models(df, response_var, predictor_vars):
     return formulas
 
 
+# Multilevel models formulas
 def generate_multilevel_models(df, response_var, predictor_vars):
     multilevel_models = set()  # Use a set to track unique models
     
@@ -107,28 +113,33 @@ def generate_multilevel_models(df, response_var, predictor_vars):
                 multilevel_models.add(fixed_effect_random_intercept_formula)
                 
                 # Random intercept and slope models
-                random_intercept_and_slope_formula = f"{response_var} ~ 1 + ({fixed_effects} | {grouping_var})"
-                multilevel_models.add(random_intercept_and_slope_formula)
+                if grouping_var not in combo:  # Exclude cases where grouping_var is in the fixed effects
+                    random_intercept_and_slope_formula = f"{response_var} ~ 1 + ({fixed_effects} | {grouping_var})"
+                    multilevel_models.add(random_intercept_and_slope_formula)
+                    
+                    fixed_effect_random_intercept_and_slope_formula = f"{response_var} ~ {fixed_effects} + ({fixed_effects} | {grouping_var})"
+                    multilevel_models.add(fixed_effect_random_intercept_and_slope_formula)
                 
-                fixed_effect_random_intercept_and_slope_formula = f"{response_var} ~ {fixed_effects} + ({fixed_effects} | {grouping_var})"
-                multilevel_models.add(fixed_effect_random_intercept_and_slope_formula)
-                
-                # Random slope models without intercept
-                random_slope_formula = f"{response_var} ~ 1 + (0 + {fixed_effects} | {grouping_var})"
-                multilevel_models.add(random_slope_formula)
-                
-                fixed_effect_random_slope_formula = f"{response_var} ~ {fixed_effects} + (0 + {fixed_effects} | {grouping_var})"
-                multilevel_models.add(fixed_effect_random_slope_formula)
+                # Random slope models without intercept, ensuring grouping_var is not involved in random slope
+                random_slope_terms = ' + '.join([var for var in combo if var != grouping_var])
+                if random_slope_terms:  # Only if there's something to add
+                    random_slope_formula = f"{response_var} ~ 1 + (0 + {random_slope_terms} | {grouping_var})"
+                    multilevel_models.add(random_slope_formula)
+                    
+                    fixed_effect_random_slope_formula = f"{response_var} ~ {fixed_effects} + (0 + {random_slope_terms} | {grouping_var})"
+                    multilevel_models.add(fixed_effect_random_slope_formula)
     
     return list(multilevel_models)  # Convert set back to list for the final output
 
+
+# Generate all possible models (the meaningful ones)
 def generate_all_models(df, response_var, predictor_vars):
     null_models = generate_null_models(response_var)
     simple_and_additional_models = generate_simple_and_additional_models(df, response_var, predictor_vars)
     interaction_models = generate_interaction_models(df, response_var, predictor_vars)
 
     # Check for 'category' dtype columns
-    category_columns = df.select_dtypes(include='category')
+    category_columns = df[predictor_vars].select_dtypes(include='category')
     if not category_columns.empty:
         multilevel_models = generate_multilevel_models(df, response_var, predictor_vars)
         all_models = null_models + simple_and_additional_models + interaction_models + multilevel_models

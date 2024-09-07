@@ -6,6 +6,8 @@ import warnings
 import statsmodels.formula.api as smf
 import gc
 
+
+# A function to compute the indexes of the models
 def compute_models_indexes(df, model_formulas, batch_size=10, output_file = os.path.join(os.getcwd(), "models.txt")):
     """
     Evaluate a list of model formulas using linear regression and determine the best model.

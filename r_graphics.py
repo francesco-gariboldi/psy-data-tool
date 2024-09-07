@@ -336,7 +336,7 @@ def dynamic_scatterplot(df_r, response_var, predictor_vars):
                          geom_point(position=position_jitter(width=0.2, height=0), alpha=0.7) +
                          geom_smooth(method="lm", se=FALSE) +
                          labs(title = "Relation between {predictor_var} (Factor) and {response_var}", 
-                              x = "{predictor_var}", 
+                              x = "{predictor_var}",
                               y = "{response_var}") +
                          theme_minimal()
         
@@ -346,13 +346,13 @@ def dynamic_scatterplot(df_r, response_var, predictor_vars):
                 {predictor_var} = r_df${predictor_var}
             )
             
-            plot{i+1} <- ggplot(plot_data_{i}, aes(x={predictor_var}, y={response_var})) +
-                         geom_point() +
-                         geom_smooth(method="lm") +
+            plot{i+1} <- ggplot(plot_data_{i}, aes(x={predictor_var}, y={response_var}, color={predictor_var})) +
+                         geom_point(color="#2f3b86ff") +
+                         geom_smooth(method="lm", color="#6327b3ff", fill="#5e9185ff") +
                          labs(title = "Relation between {predictor_var} and {response_var}", 
                               x = "{predictor_var}", 
                               y = "{response_var}") +
-                         theme_minimal()
+                         theme(panel.background = element_rect(fill = '#e2dfd8ff', colour = '#2f3b86ff'))
         }}
         
         plot_list[[{i+1}]] <- plot{i+1}

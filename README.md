@@ -1,8 +1,6 @@
 # psy-data-tool
 My psychology master thesis project. A semi automatic linear regression models generation and comparison tool. Python and R are both used through Rpy2.
 
-Here is the English version of your markdown:
-
 ## **Instructions for Use: Software Requirements and Configuration**
 
 The program will be available for download on Github.com.

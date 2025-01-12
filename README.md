@@ -1,8 +1,6 @@
 # psy-data-tool
 My psychology master thesis project. A semi automatic linear regression models generation and comparison tool. Python and R are both used through Rpy2.
 
-Here is the English version of your markdown:
-
 ## **Instructions for Use: Software Requirements and Configuration**
 
 The program will be available for download on Github.com.
@@ -90,7 +88,7 @@ Here’s how you can set the `R_HOME` environment variable directly from a Pytho
 ```jupyter
 import os  
   
-os.environ['R_HOME'] = '/usr/lib/R'   # Replace with the output of the `R RHOME` command run in your terminal.
+os.environ['R_HOME'] = '/usr/lib/R'   # Replace with the output of the `R RHOME` command (run it in your terminal).
   
 import rpy2
 ```
@@ -130,7 +128,7 @@ Before installing the packages in Jupyter, run the following command in a cell, 
 %load_ext rpy2.ipython
 ```
 
-## There are two ways to install R packages in Jupyter via rpy2:
+## Two ways to install R packages in Jupyter via rpy2:
 ### 1) Through Python using rpy2
 (recommended, as it allows the code to be used outside the Jupyter notebook. Just copy it into a Python script and it will work).
 
@@ -166,3 +164,10 @@ utils.install_packages(rpy2.robjects.vectors.StrVector(packnames))
 ```
 
 At this point, all the requirements for running the program are satisfied.
+
+Before using the explore_data function standardize column names (to lower cased snake_case). It is necessary for the program to work:
+```
+df.columns = df.columns.str.replace('%', '').str.replace('(', '').str.replace(')', '').str.strip().str.lower().str.replace(' ', '_')
+```
+
+I would like to make a package of this project in the future, but I don't know if it's possible due to its hybrid nature (R and Python).

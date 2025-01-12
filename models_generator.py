@@ -1,5 +1,5 @@
 import pandas as pd
-from itertools import combinations, chain
+from itertools import combinations
 
 
 # Null models formulas

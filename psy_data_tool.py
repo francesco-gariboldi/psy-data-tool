@@ -4,8 +4,8 @@ import rpy2
 import pandas as pd
 from IPython.display import display, Image
 
-# Set env variable R_HOME through python. Change the path according to your platform/OS
-# and your filesystem.
+# Set env variable R_HOME through python. Change the path according to your
+# platform/OS and your filesystem.
 os.environ['R_HOME'] = '/usr/lib/R'
 
 # Loading R packages
@@ -29,13 +29,12 @@ import models_comparison
 import r_warnings
 import r_graphics
 import r_models
+import gen_obsidian_vault
 
 
-# A function to automate models generation, models performances
-# and graphical representations for psychological research. It
-# generates a JSON report and takes data from it for an
+# Generate a JSON report and take data from it for an
 # intelligent categorization of the database variablels.
-def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
+def explore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_path=""):
     '''A function to automate models generation, models performances
     and graphical representations for psychological research. It
     generates a JSON report and takes data from it for an
@@ -65,13 +64,7 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
     # Adapt the DataFrame to be converted to R's dataframe
     df_r = adapt_r(df)
 
-    # Transfer the DataFrame to R
-    # The pandas2ri.py2ri function support the reverse operation to convert DataFrames
-    # into the equivalent R object (that is, data.frame)
-    # From release 2.0.0rc1 the function py2ri() moved to the new module 'conversion'.
-    # Adding the prefix conversion. to calls to those functions will be enough
-    # to update existing code.
-    # It works but needs modification.
+    # Transfer the DataFrame to R's global environment
     rpy2.robjects.globalenv['df_r'] = rpy2.robjects.pandas2ri.py2rpy(df_r)
 
     # Generate model formulas based on the response and predictor variables
@@ -88,10 +81,10 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
     rpy2.robjects.r("str(df_r)")
     
     # Compute evaluation indexes
-    evaluation_results = models_features.compute_models_indexes(df, model_formulas)
+    models_indexes = models_features.compute_models_indexes(df, model_formulas)
 
     # Perform weighted evaluation
-    best_models = models_comparison.weighted_evaluation(evaluation_results['non_mixed'], evaluation_results['mixed'])
+    best_models = models_comparison.weighted_evaluation(models_indexes['non_mixed'], models_indexes['mixed'])
 
     # Print R warnings if print_warnings is True
     if print_r_warnings:
@@ -115,3 +108,10 @@ def explore_data(df, response_var, predictor_vars, print_r_warnings=True):
 
     # Return response variable and predictor variables
     return response_var, predictor_vars, best_models, df_r
+
+    # Define the path for the Obsidian vault creation
+    if vault_path=="":
+        return None
+    else:
+        gen_obsidian_vault.write_models_to_obsidian(vault_path=vault_path)
+        gen_obsidian_vault.populate_vault(models_json_path, vault_path)

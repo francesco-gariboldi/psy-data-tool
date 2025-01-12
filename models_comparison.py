@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 def normalize_metric(values, reverse=False):
     """
@@ -11,52 +12,39 @@ def normalize_metric(values, reverse=False):
     Returns:
     list: A list of normalized metric values.
     """
-
-    # Attempt to normalize metric values
     try:
-        # Check for empty values list (no models to compare)
-        if len(values) != 0:
-            
-            # Convert values to a NumPy array
-            values = np.array(values)
-            
-            # Find the minimum and maximum values
-            min_val = values.min()
-            max_val = values.max()
-            
-            # Check for identical values (no variation)
-            if min_val == max_val and len(values) > 1:
-                raise ValueError("All values are identical; cannot normalize")
-            
-            # Normalize values
-            if reverse:
-                # Reverse normalization for metrics that should be minimized
-                normalized = (max_val - values) / (max_val - min_val)
-            else:
-                normalized = (values - min_val) / (max_val - min_val)
-            
-            return normalized
-        else:
-            raise ValueError(f"No values to normalize")
-    except (ValueError):
-        print("Error: Unable to normalize metric values")
+        if len(values) == 0:
+            raise ValueError("No values to normalize")
+
+        values = np.array(values)
+        min_val = values.min()
+        max_val = values.max()
+        
+        if min_val == max_val and len(values) > 1:
+            raise ValueError("All values are identical; cannot normalize")
+
+        normalized = (max_val - values) / (max_val - min_val) if reverse else (values - min_val) / (max_val - min_val)
+        return normalized
+    except ValueError as e:
+        print(f"Normalization Error: {e}")
         return None
 
 
-def weighted_evaluation(non_mixed_results, mixed_results, weights=None):
+def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_json_path="./models.json"):
     """
-    Perform a weighted evaluation of models based on multiple metrics.
-    
+    Perform a weighted evaluation of models based on multiple metrics, appending composite scores
+    to each model in models.json.
+
     Parameters:
-    non_mixed_results (list): A list of dictionaries containing metrics for non-mixed models (aic, bic, r_squared, adj_r_squared).
-    mixed_results (list): A list of dictionaries containing metrics for mixed models (aic, bic, marginal_r_squared, conditional_r_squared).
-    weights (dict): A dictionary specifying the weights for each metric.
-    
+    - non_mixed_results (list): A list of dictionaries for non-mixed models.
+    - mixed_results (list): A list of dictionaries for mixed models.
+    - weights (dict): A dictionary specifying the weights for each metric.
+    - models_json_path (str): Path to the models.json file to update.
+
     Returns:
-    dict: The best models based on the weighted evaluation for non-mixed and mixed models.
+    dict: The best models with updated composite scores.
     """
     if weights is None:
-        # Default weights for each metric (can be adjusted)
         weights = {
             'aic': 0.25,
             'bic': 0.25,
@@ -65,65 +53,70 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None):
             'marginal_r_squared': 0.25,
             'conditional_r_squared': 0.25
         }
-    
+
     def evaluate(results, metric_keys):
         """
-        Evaluate the results of a model comparison based on specified metrics.
-        
+        Add composite scores to each model and find the best one.
+
         Parameters:
-        - results (list of dict): The results of the model comparison.
-        - metric_keys (list of str): The keys of the metrics to be evaluated.
-        
+        - results (list of dict): Models to evaluate.
+        - metric_keys (list of str): Metrics used in evaluation.
+
         Returns:
-        - best_model: A dictionary of the best model (non-mixed or mixed) based on the highest composite score.
+        dict: The best model based on the composite score.
         """
-        problematic_models = []
         composite_scores = []
+        problematic_models = []
+
+        # Extract metric values for normalization
+        metrics_data = {key: [r.get(key, float('inf')) for r in results] for key in metric_keys}
+        normalized_metrics = {key: normalize_metric(values, reverse=(key in ['aic', 'bic'])) for key, values in metrics_data.items()}
 
         for i, result in enumerate(results):
             try:
-                # Extract metric values for the current result
-                metrics = {key: result[key] for key in metric_keys if key in result}
-                
-                # Normalize metrics
-                normalized_metrics = {key: normalize_metric([metrics[key]], reverse=(key in ['aic', 'bic']))[0] for key in metrics}
-                
                 # Calculate composite score
-                composite_score = sum(weights[key] * normalized_metrics[key] for key in normalized_metrics)
+                composite_score = sum(weights[key] * normalized_metrics[key][i] for key in metric_keys if key in result)
+                result['composite_score'] = composite_score
                 composite_scores.append(composite_score)
-                
             except ValueError as e:
-                # Append the error and problematic formula to the list
                 formula = result.get('formula', f'Unknown Model {i}')
                 problematic_models.append(f"Error: {e} for model formula '{formula}'")
-        
-        # Print all problematic models if any errors occurred
+
+        # Report problematic models
         if problematic_models:
             for error in problematic_models:
                 print(error)
-        
-        # If no valid composite scores, print an error and return None
-        if not composite_scores:
-            print("Error: No models to evaluate")
-            return None
-        
-        # Find the best model (highest composite score)
-        best_model_index = np.argmax(composite_scores)
-        best_model = results[best_model_index]
-        
-        return best_model
-    
-    # Evaluate non-mixed models
-    non_mixed_best_model = evaluate(results=non_mixed_results, metric_keys=['aic', 'bic', 'r_squared', 'adj_r_squared'])
-    
-    # Evaluate mixed models
-    mixed_best_model = evaluate(results=mixed_results, metric_keys=['aic', 'bic', 'marginal_r_squared', 'conditional_r_squared'])
-    
-    # Print best models
-    print("\nBest Non-Mixed Model:", non_mixed_best_model)
-    print("\nBest Mixed Model:", mixed_best_model)
 
+        # Find and return the best model
+        if composite_scores:
+            best_model_index = np.argmax(composite_scores)
+            return results[best_model_index], composite_scores
+        else:
+            print("Error: No valid models to evaluate")
+            return None
+
+    # Evaluate non-mixed and mixed models
+    non_mixed_best_model = evaluate(non_mixed_results, ['aic', 'bic', 'r_squared', 'adj_r_squared'])
+    mixed_best_model = evaluate(mixed_results, ['aic', 'bic', 'marginal_r_squared', 'conditional_r_squared'])
+
+    # Save the updated results to models.json
+    if models_json_path:
+        try:
+            with open(models_json_path, "r", encoding="utf-8") as json_file:
+                models_data = json.load(json_file)
+
+            models_data['non_mixed'] = non_mixed_results
+            models_data['mixed'] = mixed_results
+
+            with open(models_json_path, "w", encoding="utf-8") as json_file:
+                json.dump(models_data, json_file, indent=4)
+
+            print(f"Updated models.json with composite scores at '{models_json_path}'")
+        except Exception as e:
+            print(f"Error updating models.json: {e}")
+
+    # Return the best models and composite_scores list
     return {
-        'non_mixed_best_model': non_mixed_best_model,
-        'mixed_best_model': mixed_best_model
+        'non_mixed': non_mixed_best_model,
+        'mixed': mixed_best_model
     }

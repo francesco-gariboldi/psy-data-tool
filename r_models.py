@@ -24,6 +24,10 @@ def best_non_mixed_model_performances(best_models, df_r, response_var, predictor
         # Compute the performances of the mixed model
         performances = rpy2.robjects.r(f"performance::performance(non_mixed_model)")
 
+        # Print the confidence intervals for the non-mixed model
+        #conf_intervals = rpy2.robjects.r(f"confint(non_mixed_model)")
+        #print(f"Confidence intervals: {conf_intervals}\n")
+
         # Print the performances
         print(performances)
     else:
@@ -53,6 +57,10 @@ def mixed_best_model_performances(best_models, df_r, response_var, predictor_var
 
         # Compute the performances of the mixed model
         performances = rpy2.robjects.r(f"performance::performance(mixed_model)")
+        
+        #Print the confidence intervals for the mixed model
+        #conf_intervals = rpy2.robjects.r(f"confint(mixed_model)")
+        #print(f"Confidence intervals: {conf_intervals}\n")
 
         # Print the performances
         print(performances)

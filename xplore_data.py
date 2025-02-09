@@ -34,7 +34,7 @@ import gen_obsidian_vault
 
 # Generate a JSON report and take data from it for an
 # intelligent categorization of the database variablels.
-def explore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_path=""):
+def xplore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_path=""):
     '''A function to automate models generation, models performances
     and graphical representations for psychological research. It
     generates a JSON report and takes data from it for an

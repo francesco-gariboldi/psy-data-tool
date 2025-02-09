@@ -165,7 +165,7 @@ utils.install_packages(rpy2.robjects.vectors.StrVector(packnames))
 
 At this point, all the requirements for running the program are satisfied.
 
-Before using the explore_data function standardize column names (to lower cased snake_case). It is necessary for the program to work:
+Before using the xplore_data function standardize column names (to lower cased snake_case). It is necessary for the program to work:
 ```
 df.columns = df.columns.str.replace('%', '').str.replace('(', '').str.replace(')', '').str.strip().str.lower().str.replace(' ', '_')
 ```

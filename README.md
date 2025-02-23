@@ -7,7 +7,7 @@ The program will be available for download on Github.com.
 
 It is my intention to create a software package for the project in the future, so the following configuration steps won't be necessary. For now, the configuration must be done manually and requires the following steps.
 
-N.B. Commands to be run from the terminal (Linux) are prefixed with the symbol `$.`
+N.B. Commands to be run from the terminal (Linux) are prefixed with `$`.
 
 ### Linux or WSL2
 

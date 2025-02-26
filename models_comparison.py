@@ -45,11 +45,19 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
     Returns:
     dict: The best models with updated composite scores.
     """
+    # Define IS_COLAB based on the environment
+    try:
+        IS_COLAB = 'google.colab' in str(get_ipython())
+    except NameError:
+        IS_COLAB = False
+
     # Set the models.json path if running in Google Colab
     try:
         if IS_COLAB:
-        # If running in Google Colab, use Colab's directory for models.json
-        models_json_path = "/content/models.json"
+            # If running in Google Colab, use Colab's directory for models.json
+            models_json_path = "/content/models.json"
+        else:
+            print("Not in colab. I'll retrieve the 'models.json' path from the local OS")
     except ImportError:
         # Otherwise, use a local path relative to the current working directory
         models_json_path = os.path.join(os.getcwd(), "models.json")
@@ -63,6 +71,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
             'marginal_r_squared': 0.25,
             'conditional_r_squared': 0.25
         }
+
 
     def evaluate(results, metric_keys):
         """

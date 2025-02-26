@@ -55,7 +55,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
     try:
         if IS_COLAB:
             # If running in Google Colab, use Colab's directory for models.json
-            models_json_path = "/content/models.json"
+            models_json_path = "/content/psy-data-tool/models.json"
         else:
             print("Not in colab. I'll retrieve the 'models.json' path from the local OS")
     except ImportError:

@@ -93,7 +93,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
 
         for i, result in enumerate(results):
             try:
-                # Calculate composite score
+                # Calculate composite score and put it in the composite_scores list
                 composite_score = sum(weights[key] * normalized_metrics[key][i] for key in metric_keys if key in result)
                 result['composite_score'] = composite_score
                 composite_scores.append(composite_score)
@@ -111,7 +111,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
             best_model_index = np.argmax(composite_scores)
             return results[best_model_index], composite_scores
         else:
-            print("Error: No valid models to evaluate")
+            print("Error: No valid models to evaluate.")
             return None
 
     # Evaluate non-mixed and mixed models
@@ -133,6 +133,8 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
             print(f"Updated models.json with composite scores at '{models_json_path}'")
         except Exception as e:
             print(f"Error updating models.json: {e}")
+            raise e
+            
 
     # Return the best models and composite_scores list
     return {

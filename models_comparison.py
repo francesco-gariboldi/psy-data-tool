@@ -1,6 +1,8 @@
 import numpy as np
 import json
 import os
+import sys
+
 
 def normalize_metric(values, reverse=False):
     """
@@ -61,6 +63,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
     except ImportError:
         # Otherwise, use a local path relative to the current working directory
         models_json_path = os.path.join(os.getcwd(), "models.json")
+        sys.exit(1)
     
     if weights is None:
         weights = {
@@ -133,8 +136,6 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
             print(f"Updated models.json with composite scores at '{models_json_path}'")
         except Exception as e:
             print(f"Error updating models.json: {e}")
-            raise e
-            
 
     # Return the best models and composite_scores list
     return {

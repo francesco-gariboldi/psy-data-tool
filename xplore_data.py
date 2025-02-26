@@ -88,11 +88,15 @@ def xplore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_p
     # Perform weighted evaluation
     best_models = models_comparison.weighted_evaluation(models_indexes['non_mixed'], models_indexes['mixed'])
 
+    # Print the best models
+    for model in best_models:
+        print(f"{model}: {best_models[model]}\n")
+
     # Print R warnings if print_warnings is True
     if print_r_warnings:
         r_warnings.print_r_warnings()
 
-    # Plot diagnostics for the best models
+    # Plot for the best models diagnostics
     r_graphics.plot_best_models_diagnostics_ggplot2(best_models, df_r)
     
     # Print R warnings again if print_warnings is True

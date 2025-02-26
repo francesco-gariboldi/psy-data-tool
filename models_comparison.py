@@ -139,6 +139,6 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
 
     # Return the best models and composite_scores list
     return {
-        'non_mixed': non_mixed_best_model,
-        'mixed': mixed_best_model
+        'non_mixed_best_model': non_mixed_best_model,
+        'mixed_best_model': mixed_best_model
     }

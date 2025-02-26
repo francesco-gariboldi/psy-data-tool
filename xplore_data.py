@@ -1,3 +1,5 @@
+# The main function of the psy-data-tool project
+
 # Importing Python packages
 import os
 import rpy2
@@ -73,11 +75,11 @@ def xplore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_p
     # Output generated models amount
     models_amount_msg(model_formulas)
     
-    # Output generated models amount
+    # Output generated models formulas
     for model in model_formulas:
         print(f"{model}\n")
 
-    # Print the R dataframe structure after conversion 
+    # Print the R dataframe structure after conversion
     rpy2.robjects.r("str(df_r)")
     
     # Compute evaluation indexes

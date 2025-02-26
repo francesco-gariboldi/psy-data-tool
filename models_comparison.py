@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import os
 
 def normalize_metric(values, reverse=False):
     """
@@ -30,7 +31,7 @@ def normalize_metric(values, reverse=False):
         return None
 
 
-def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_json_path="./models.json"):
+def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_json_path=None):
     """
     Perform a weighted evaluation of models based on multiple metrics, appending composite scores
     to each model in models.json.
@@ -44,6 +45,15 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
     Returns:
     dict: The best models with updated composite scores.
     """
+    # Set the models.json path if running in Google Colab
+    try:
+        if IS_COLAB:
+        # If running in Google Colab, use Colab's directory for models.json
+        models_json_path = "/content/models.json"
+    except ImportError:
+        # Otherwise, use a local path relative to the current working directory
+        models_json_path = os.path.join(os.getcwd(), "models.json")
+    
     if weights is None:
         weights = {
             'aic': 0.25,

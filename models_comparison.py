@@ -109,7 +109,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
             for error in problematic_models:
                 print(error)
 
-        # Find and return the best model
+        # Find and return the best model's formula
         if composite_scores:
             best_model_index = np.argmax(composite_scores)
             return results[best_model_index], composite_scores
@@ -117,7 +117,7 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
             print("Error: No valid models to evaluate.")
             return None
 
-    # Evaluate non-mixed and mixed models
+    # Evaluate non-mixed and mixed models (formulae)
     non_mixed_best_model = evaluate(non_mixed_results, ['aic', 'bic', 'r_squared', 'adj_r_squared'])
     mixed_best_model = evaluate(mixed_results, ['aic', 'bic', 'marginal_r_squared', 'conditional_r_squared'])
 

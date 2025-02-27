@@ -85,12 +85,20 @@ def xplore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_p
     # Compute evaluation indexes
     models_indexes = models_features.compute_models_indexes(df, model_formulas)
 
-    # Perform weighted evaluation
+    # Perform weighted evaluation and return the best models formulae and
+    # the relative composite scores
     best_models = models_comparison.weighted_evaluation(models_indexes['non_mixed'], models_indexes['mixed'])
 
     # Print the best models
+    print("--------------------------------------------------------")
+    print(f"\nBest models object: {best_models}\n")
+    print("--------------------------------------------------------")
+
+    # Print the best models
+    print("--------------------------------------------------------")
     for model in best_models:
         print(f"{model}: {best_models[model]}\n")
+    print("--------------------------------------------------------")
 
     # Print R warnings if print_warnings is True
     if print_r_warnings:

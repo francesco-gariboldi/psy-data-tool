@@ -15,8 +15,11 @@ def compute_models_indexes(df, model_formulas, batch_size=10, output_file=os.pat
     
     Parameters:
     df (pd.DataFrame): The input DataFrame containing the data.
+
     model_formulas (list): A list of model formula strings to be evaluated.
+    
     batch_size (int): The number of models to process in each batch.
+    
     output_file (str): The JSON file to write the results to.
     
     Returns:

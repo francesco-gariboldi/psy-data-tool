@@ -14,43 +14,43 @@ def plot_best_models_diagnostics(best_models, df_r):
     
     # Plot for non-mixed model if available
     if best_models.get('non_mixed_best_model'):
-        non_mixed_formula = best_models['non_mixed_best_model']['formula']
-        r_non_mixed_formula = rpy2.robjects.StrVector([non_mixed_formula])
-        rpy2.robjects.globalenv['non_mixed_formula'] = r_non_mixed_formula[0] 
-        print(f"Non-mixed model formula: {non_mixed_formula}")
+        non_mixed_best_formula = best_models['non_mixed_best_model']['formula']
+        r_non_mixed_best_formula = rpy2.robjects.StrVector([non_mixed_best_formula])
+        rpy2.robjects.globalenv['non_mixed_best_formula'] = r_non_mixed_best_formula[0] 
+        print(f"Non-mixed best model formula: {non_mixed_best_formula}")
 
         r_code += f"""
-        non_mixed_model <- lm(non_mixed_formula, data=df_r)
+        non_mixed_best_model <- lm(non_mixed_best_formula, data=df_r)
         
         par(mfrow=c(4,1))
 
         # Diagnostic graphics for best non-mixed model
-        plot(non_mixed_model, which=1, main=sprintf("Non-Mixed Model: %s - Residuals vs Fitted", non_mixed_formula))
-        plot(non_mixed_model, which=2, main=sprintf("Non-Mixed Model: %s - Normal Q-Q", non_mixed_formula))
-        plot(non_mixed_model, which=3, main=sprintf("Non-Mixed Model: %s - Scale-Location", non_mixed_formula))
-        plot(non_mixed_model, which=5, main=sprintf("Non-Mixed Model: %s - Residuals vs Leverage", non_mixed_formula))
+        plot(non_mixed_best_model, which=1, main=sprintf("Non-Mixed Model: %s - Residuals vs Fitted", non_mixed_best_formula))
+        plot(non_mixed_best_model, which=2, main=sprintf("Non-Mixed Model: %s - Normal Q-Q", non_mixed_best_formula))
+        plot(non_mixed_best_model, which=3, main=sprintf("Non-Mixed Model: %s - Scale-Location", non_mixed_best_formula))
+        plot(non_mixed_best_model, which=5, main=sprintf("Non-Mixed Model: %s - Residuals vs Leverage", non_mixed_best_formula))
         """
     else:
         print("The best non-mixed model is missing or invalid.")
 
     # Plot for mixed model if available
     if best_models.get('mixed_best_model'):
-        mixed_formula = best_models['mixed_best_model']['formula']
-        r_mixed_formula = rpy2.robjects.StrVector([mixed_formula])
-        rpy2.robjects.globalenv['mixed_formula'] = r_mixed_formula[0]
-        print(f"Mixed model formula: {mixed_formula}")
+        mixed_best_formula = best_models['mixed_best_model']['formula']
+        r_mixed_best_formula = rpy2.robjects.StrVector([mixed_best_formula])
+        rpy2.robjects.globalenv['mixed_best_formula'] = r_mixed_best_formula[0]
+        print(f"Mixed best model formula: {mixed_best_formula}")
 
         r_code += f"""
-        mixed_model <- lmer(mixed_formula, data=df_r)
+        mixed_best_model <- lmer(mixed_best_formula, data=df_r)
 
         par(mfrow=c(5,1))
 
         # Mixed Model diagnostic graphics using appropriate functions
-        plot1 <- plot(fitted(mixed_model), resid(mixed_model), main=sprintf("Mixed Model: %s - Residuals vs Fitted", mixed_formula))
-        plot2 <- qqnorm(resid(mixed_model), main=sprintf("Mixed Model: %s - Normal Q-Q", mixed_formula))
-        plot3 <- qqline(resid(mixed_model))
-        plot4 <- (fitted(mixed_model), sqrt(abs(resid(mixed_model))), main=sprintf("Mixed Model: %s - Scale-Location", mixed_formula))
-        plot5 <- (hatvalues(mixed_model), resid(mixed_model), main=sprintf("Mixed Model: %s - Residuals vs Leverage", mixed_formula))
+        plot1 <- plot(fitted(mixed_best_model), resid(mixed_best_model), main=sprintf("Mixed Model: %s - Residuals vs Fitted", mixed_best_formula))
+        plot2 <- qqnorm(resid(mixed_best_model), main=sprintf("Mixed Model: %s - Normal Q-Q", mixed_best_formula))
+        plot3 <- qqline(resid(mixed_best_model))
+        plot4 <- (fitted(mixed_best_model), sqrt(abs(resid(mixed_best_model))), main=sprintf("Mixed Model: %s - Scale-Location", mixed_best_formula))
+        plot5 <- (hatvalues(mixed_best_model), resid(mixed_best_model), main=sprintf("Mixed Model: %s - Residuals vs Leverage", mixed_best_formula))
 
         # Arrange the plots in a 5x1 grid
         grid.arrange(plot1, plot2, plot3, plot4, plot5, ncol=1)
@@ -91,32 +91,35 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
     
     # Plot for non-mixed model if available
     if best_models.get('non_mixed_best_model'):
-        non_mixed_formula = best_models['non_mixed_best_model']['formula']
-        r_non_mixed_formula = rpy2.robjects.StrVector([non_mixed_formula])
-        rpy2.robjects.globalenv['non_mixed_formula'] = r_non_mixed_formula[0] 
-        print(f"Non-mixed model formula: {non_mixed_formula}")
+        # Retrieve the formula for the non-mixed model (Python string)
+        non_mixed_best_formula = best_models['non_mixed_best_model']['formula']
+        # Convert the formula to an R string and assign it to the R
+        # environment
+        r_non_mixed_best_formula = rpy2.robjects.StrVector([non_mixed_best_formula])
+        rpy2.robjects.globalenv['non_mixed_best_formula'] = r_non_mixed_best_formula[0] 
+        print(f"Non-mixed model formula: {non_mixed_best_formula}")
 
         r_code += f"""
-        non_mixed_model <- lm(non_mixed_formula, data=df_r)
+        non_mixed_best_model <- lm(non_mixed_best_formula, data=df_r)
         
         par(mfrow=c(4,1))
 
         # Residuals vs. Fitted plot directly in Jupyter with gglm()
-        plot1 <- ggplot(data = non_mixed_model) +
+        plot1 <- ggplot(data = non_mixed_best_model) +
                     stat_fitted_resid() +
                     labs(title = sprintf("Residuals vs. Fitted values for the non-mixed model:\n%s",
-                                        paste(deparse(formula(non_mixed_model)), collapse = "")))
+                                        paste(deparse(formula(non_mixed_best_model)), collapse = "")))
 
 
         # Normal Q-Q plot
-        plot2 <- ggplot(data = non_mixed_model) +
+        plot2 <- ggplot(data = non_mixed_best_model) +
                     stat_normal_qq() +
                     labs(title = sprintf("Normall Q-Q for the non-mixed model:\n%s",
-                                        paste(deparse(formula(non_mixed_model)), collapse = "")))
+                                        paste(deparse(formula(non_mixed_best_model)), collapse = "")))
 
 
         # Scale location diagnostic plot
-        plot3 <- ggplot(data = non_mixed_model) +
+        plot3 <- ggplot(data = non_mixed_best_model) +
                        stat_scale_location(
                        alpha = 0.5,
                        na.rm = TRUE,
@@ -125,11 +128,11 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
                        color = "steelblue",
                        ) +
                        labs(title = sprintf("Scale location (Residuals vs Fitted) values for the non-mixed model:\n%s",
-                                           paste(deparse(formula(non_mixed_model)), collapse = "")))
+                                           paste(deparse(formula(non_mixed_best_model)), collapse = "")))
 
 
         # Residual vs. leverage plot.
-        plot4 <- ggplot(data = non_mixed_model) +
+        plot4 <- ggplot(data = non_mixed_best_model) +
                        stat_resid_leverage(
                        alpha = 0.5,
                        method = "loess",
@@ -137,7 +140,7 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
                        color = "steelblue",
                        ) +
                        labs(title = sprintf("Residual vs. Leverage values for the non-mixed model:\n%s",
-                                           paste(deparse(formula(non_mixed_model)), collapse = "")))                                   
+                                           paste(deparse(formula(non_mixed_best_model)), collapse = "")))                                   
 
         # Arrange the plots in a 4x1 grid
         grid.arrange(plot1, plot2, plot3, plot4, ncol=1)
@@ -147,32 +150,32 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
 
     # Plot for mixed model if available
     if best_models.get('mixed_best_model'):
-        mixed_formula = best_models['mixed_best_model']['formula']
-        r_mixed_formula = rpy2.robjects.StrVector([mixed_formula])
-        rpy2.robjects.globalenv['mixed_formula'] = r_mixed_formula[0]
-        print(f"Mixed model formula: {mixed_formula}")
+        mixed_best_formula = best_models['mixed_best_model']['formula']
+        r_mixed_best_formula = rpy2.robjects.StrVector([mixed_best_formula])
+        rpy2.robjects.globalenv['mixed_best_formula'] = r_mixed_best_formula[0]
+        print(f"Mixed model formula: {mixed_best_formula}")
 
         r_code += f"""
-        mixed_model <- lmer(mixed_formula, data=df_r)
+        mixed_best_model <- lmer(mixed_best_formula, data=df_r)
         
         par(mfrow=c(4,1))
 
         # Residuals vs. Fitted plot directly in Jupyter with gglm()
-        plot1 <- ggplot(data = mixed_model) +
+        plot1 <- ggplot(data = mixed_best_model) +
                     stat_fitted_resid() +
                     labs(title = sprintf("Residuals vs. Fitted values for the mixed model:\n%s",
-                                        paste(deparse(formula(mixed_model)), collapse = "")))
+                                        paste(deparse(formula(mixed_best_model)), collapse = "")))
 
 
         # Normal Q-Q plot
-        plot2 <- ggplot(data = mixed_model) +
+        plot2 <- ggplot(data = mixed_best_model) +
                     stat_normal_qq() +
                     labs(title = sprintf("Normall Q-Q for the mixed model:\n%s",
-                                        paste(deparse(formula(mixed_model)), collapse = "")))
+                                        paste(deparse(formula(mixed_best_model)), collapse = "")))
 
 
         # Scale location diagnostic plot
-        plot3 <- ggplot(data = mixed_model) +
+        plot3 <- ggplot(data = mixed_best_model) +
                        stat_scale_location(
                        alpha = 0.5,
                        na.rm = TRUE,
@@ -181,11 +184,11 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
                        color = "steelblue",
                        ) +
                        labs(title = sprintf("Scale location (Residuals vs Fitted) values for the mixed model:\n%s",
-                                           paste(deparse(formula(mixed_model)), collapse = "")))
+                                           paste(deparse(formula(mixed_best_model)), collapse = "")))
 
 
         # Residual vs. leverage plot.
-        plot4 <- ggplot(data = mixed_model) +
+        plot4 <- ggplot(data = mixed_best_model) +
               stat_resid_leverage(
               alpha = 0.5,
               method = "loess",
@@ -193,7 +196,7 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
               color = "steelblue",
               ) +
               labs(title = sprintf("Residual vs. Leverage values for the mixed model:\n%s",
-                                  paste(deparse(formula(mixed_model)), collapse = "")))                                   
+                                  paste(deparse(formula(mixed_best_model)), collapse = "")))                                   
 
         # Arrange the plots in a 4x1 grid
         grid.arrange(plot1, plot2, plot3, plot4, ncol=1)

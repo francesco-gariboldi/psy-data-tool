@@ -47,15 +47,9 @@ def weighted_evaluation(non_mixed_results, mixed_results, weights=None, models_j
     Returns:
     dict: The best models with updated composite scores.
     """
-    # Define IS_COLAB based on the environment
-    try:
-        IS_COLAB = 'google.colab' in str(get_ipython())
-    except NameError:
-        IS_COLAB = False
-
     # Set the models.json path if running in Google Colab
     try:
-        if IS_COLAB:
+        if 'google.colab' in str(get_ipython()):
             # If running in Google Colab, use Colab's directory for models.json
             models_json_path = "/content/psy-data-tool/models.json"
         else:

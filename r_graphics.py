@@ -72,8 +72,13 @@ def plot_best_models_diagnostics(best_models, df_r):
         if os.path.exists(pdf_path):
             print(f"PDF generated successfully: {pdf_path}")
             
-            # Display the PDF file in the Jupyter notebook
-            display(IPython.display.IFrame(pdf_path, width=800, height=600))
+            # Display the PDF file in the Jupyter notebook if not in Colab
+            if 'google.colab' in str(get_ipython()):
+                print("diagnostics r (basic) plots generated successfully in \
+                      the working directory in 'rplots.pdf'. Download it to view \
+                      the plots.")
+                display(IPython.display.IFrame(pdf_path, width=800, height=600))
+            
         else:
             print("PDF file was not generated.")
 
@@ -92,8 +97,8 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
     # Plot for non-mixed model if available
     if best_models.get('non_mixed_best_model'):
         # Retrieve the formula for the non-mixed model (Python string)
-        non_mixed_best_formula = best_models['non_mixed_best_model'][0]['formula']
-        # Convert the formula to an R string and assign it to the R
+        non_mixed_best_formula = best_models['non_mixed_best_model'][0]['nloadformula']
+        # Convert the formula to an R string and a it to the R
         # environment
         r_non_mixed_best_formula = rpy2.robjects.StrVector([non_mixed_best_formula])
         rpy2.robjects.globalenv['non_mixed_best_formula'] = r_non_mixed_best_formula[0] 
@@ -219,7 +224,11 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
             print(f"PDF generated successfully: {pdf_path}")
             
             # Display the PDF file in the Jupyter notebook
-            display(IPython.display.IFrame(pdf_path, width=800, height=600))
+            if 'google.colab' in str(get_ipython()):
+                print("diagnostics ggplot2 plots generated successfully in \
+                      the working directory in 'rplots.pdf'. Download it to view \
+                      the plots.")
+                display(IPython.display.IFrame(pdf_path, width=800, height=600))
         else:
             print("PDF file was not generated.")
 
@@ -294,7 +303,6 @@ def scatterplot(df_r, response_var, predictor_vars):
     try:
         # Execute the R code to generate the PDF
         rpy2.robjects.r(r_code)
-        print("R code executed successfully.")
 
         # Verify that the PDF was created
         pdf_path = './model_plot.pdf'
@@ -302,7 +310,11 @@ def scatterplot(df_r, response_var, predictor_vars):
             print(f"PDF generated successfully: {pdf_path}")
             
             # Display the PDF file in the Jupyter notebook
-            IPython.display.display(IPython.display.IFrame(pdf_path, width=800, height=600))
+            if 'google.colab' in str(get_ipython()):
+                print("Scatterplot generated successfully in \
+                      the working directory in 'rplots.pdf'. Download it to view \
+                      the plots.")
+                display(IPython.display.IFrame(pdf_path, width=800, height=600))
         else:
             print("PDF file was not generated.")
 
@@ -370,7 +382,6 @@ def dynamic_scatterplot(df_r, response_var, predictor_vars):
     try:
         # Execute the R code to generate the PDF
         rpy2.robjects.r(r_code)
-        print("R code executed successfully.")
 
         # Verify that the PDF was created
         pdf_path = './model_plot.pdf'
@@ -378,7 +389,11 @@ def dynamic_scatterplot(df_r, response_var, predictor_vars):
             print(f"PDF generated successfully: {pdf_path}")
             
             # Display the PDF file in the Jupyter notebook
-            IPython.display.display(IPython.display.IFrame(pdf_path, width=800, height=600))
+            if 'google.colab' in str(get_ipython()):
+                print("Dynamic scatterplot generated successfully in \
+                      the working directory in 'rplots.pdf'. Download it to view \
+                      the plots.")
+                display(IPython.display.IFrame(pdf_path, width=800, height=600))
         else:
             print("PDF file was not generated.")
 

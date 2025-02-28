@@ -97,7 +97,7 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
         # environment
         r_non_mixed_best_formula = rpy2.robjects.StrVector([non_mixed_best_formula])
         rpy2.robjects.globalenv['non_mixed_best_formula'] = r_non_mixed_best_formula[0] 
-        print(f"Non-mixed model formula: {non_mixed_best_formula}")
+        print(f"Non-mixed best model formula: {non_mixed_best_formula}")
 
         r_code += f"""
         non_mixed_best_model <- lm(non_mixed_best_formula, data=df_r)
@@ -153,7 +153,7 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
         mixed_best_formula = best_models['mixed_best_model'][0]['formula']
         r_mixed_best_formula = rpy2.robjects.StrVector([mixed_best_formula])
         rpy2.robjects.globalenv['mixed_best_formula'] = r_mixed_best_formula[0]
-        print(f"Mixed model formula: {mixed_best_formula}")
+        print(f"Mixed best model formula: {mixed_best_formula}")
 
         r_code += f"""
         mixed_best_model <- lmer(mixed_best_formula, data=df_r)

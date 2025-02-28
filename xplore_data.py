@@ -109,7 +109,7 @@ def xplore_data(df, response_var, predictor_vars, print_r_warnings=True, vault_p
     r_models.best_non_mixed_model_performances(best_models, df_r, response_var, predictor_vars)
 
     # Best mixed model performances
-    r_models.mixed_best_model_performances(best_models, df_r, response_var, predictor_vars, cat_predictor_var = None)
+    r_models.best_mixed_model_performances(best_models, df_r, response_var, predictor_vars, cat_predictor_var = None)
 
     # Scatterplots of the effects of the best models
     r_graphics.dynamic_scatterplot(df_r, response_var, predictor_vars)

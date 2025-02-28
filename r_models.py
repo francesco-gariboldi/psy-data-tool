@@ -1,7 +1,7 @@
 import rpy2
 
 # Print the non-mixed model performances
-def best_non_mixed_best_model_performances(best_models, df_r, response_var, predictor_vars):
+def best_non_mixed_model_performances(best_models, df_r, response_var, predictor_vars):
     if best_models.get('non_mixed_best_model'):
         non_mixed_best_formula = best_models['non_mixed_best_model'][0]['formula']
         r_non_mixed_best_formula = rpy2.robjects.StrVector([non_mixed_best_formula])
@@ -32,7 +32,7 @@ def best_non_mixed_best_model_performances(best_models, df_r, response_var, pred
 
 
 # Print the mixed model performances
-def best_mixed_best_model_performances(best_models, df_r, response_var, predictor_vars, cat_predictor_var):
+def best_mixed_model_performances(best_models, df_r, response_var, predictor_vars, cat_predictor_var):
     # Check if mixed best model is available
     if best_models.get('mixed_best_model'):
         mixed_best_formula = best_models['mixed_best_model'][0]['formula']

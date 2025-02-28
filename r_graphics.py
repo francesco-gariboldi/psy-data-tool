@@ -14,7 +14,7 @@ def plot_best_models_diagnostics(best_models, df_r):
     
     # Plot for non-mixed model if available
     if best_models.get('non_mixed_best_model'):
-        non_mixed_best_formula = best_models['non_mixed_best_model']['formula']
+        non_mixed_best_formula = best_models['non_mixed_best_model'][0]['formula']
         r_non_mixed_best_formula = rpy2.robjects.StrVector([non_mixed_best_formula])
         rpy2.robjects.globalenv['non_mixed_best_formula'] = r_non_mixed_best_formula[0] 
         print(f"Non-mixed best model formula: {non_mixed_best_formula}")
@@ -35,7 +35,7 @@ def plot_best_models_diagnostics(best_models, df_r):
 
     # Plot for mixed model if available
     if best_models.get('mixed_best_model'):
-        mixed_best_formula = best_models[1]['mixed_best_model']['formula']
+        mixed_best_formula = best_models['mixed_best_model'][0]['formula']
         r_mixed_best_formula = rpy2.robjects.StrVector([mixed_best_formula])
         rpy2.robjects.globalenv['mixed_best_formula'] = r_mixed_best_formula[0]
         print(f"Mixed best model formula: {mixed_best_formula}")

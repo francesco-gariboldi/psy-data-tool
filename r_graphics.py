@@ -70,7 +70,7 @@ def plot_best_models_diagnostics(best_models, df_r):
         # Verify that the PDF was created
         pdf_path = './rplots.pdf'
         if os.path.exists(pdf_path):
-            print(f"PDF generated successfully: {pdf_path}")
+            print(f"\nPDF generated successfully: {pdf_path}\n")
             
             # Display the PDF file in the Jupyter notebook if not in Colab
             if 'google.colab' in str(get_ipython()):
@@ -227,7 +227,7 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
         # Verify that the PDF was created
         pdf_path = './rplots.pdf'
         if os.path.exists(pdf_path):
-            print(f"PDF generated successfully: {pdf_path}")
+            print(f"\nPDF generated successfully: {pdf_path}\n")
             
             # Display the PDF file in the Jupyter notebook
             if 'google.colab' in str(get_ipython()):
@@ -308,7 +308,7 @@ def dynamic_scatterplot(df_r, response_var, predictor_vars):
         # Verify that the PDF was created
         pdf_path = './model_plot.pdf'
         if (os.path.exists(pdf_path)):
-            print(f"PDF generated successfully: {pdf_path}")
+            print(f"\nPDF generated successfully: {pdf_path}\n")
             
             # Display the PDF file in the Jupyter notebook
             if 'google.colab' in str(get_ipython()):

@@ -77,6 +77,12 @@ def plot_best_models_diagnostics(best_models, df_r):
                 print("diagnostics r (basic) plots generated successfully in \
                       the working directory in 'rplots.pdf'. Download it to view \
                       the plots.")
+                # Display the R plots grid directly in the Colab notebook
+                # inline.
+
+                                
+            
+            else:
                 display(IPython.display.IFrame(pdf_path, width=800, height=600))
             
         else:
@@ -228,6 +234,7 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
                 print("diagnostics ggplot2 plots generated successfully in \
                       the working directory in 'rplots.pdf'. Download it to view \
                       the plots.")
+            else:
                 display(IPython.display.IFrame(pdf_path, width=800, height=600))
         else:
             print("PDF file was not generated.")
@@ -235,91 +242,6 @@ def plot_best_models_diagnostics_ggplot2(best_models, df_r):
     except Exception as e:
         print("Error encountered while generating plots:", e)
         r_warnings.print_r_warnings()
-
-
-# Scatterplot of the relation between two variables
-def scatterplot(df_r, response_var, predictor_vars):
-    # Convert the Pandas DataFrame to an R DataFrame
-    r_df = rpy2.robjects.pandas2ri.py2rpy(df_r)
-    rpy2.robjects.globalenv['r_df'] = r_df  # Assign to R environment
-
-    # Prepare the R code for plotting
-    r_code = """
-    library(ggplot2)
-    library(gridExtra)
-    pdf(file="./model_plot.pdf", width = 10, height = 17)
-    """
-
-    if len(predictor_vars) == 1:
-        # Case with one predictor variable
-        r_code += f"""
-        plot_data <- data.frame(
-            {response_var} = r_df${response_var},
-            {predictor_vars[0]} = r_df${predictor_vars[0]}
-        )
-
-        plot1 <- ggplot(plot_data, aes(x={predictor_vars[0]}, y={response_var})) +
-                    geom_point() +
-                    geom_smooth() +
-                    labs(title = "Relation between {predictor_vars[0]} and {response_var}", 
-                         x = "{predictor_vars[0]}", 
-                         y = "{response_var}") +
-                    theme_minimal()
-
-        grid.arrange(plot1, ncol=1)
-        """
-    elif len(predictor_vars) == 2:
-        # Case with two predictor variables
-        r_code += f"""
-        plot_data <- data.frame(
-            {response_var} = r_df${response_var},
-            {predictor_vars[0]} = r_df${predictor_vars[0]},
-            {predictor_vars[1]} = r_df${predictor_vars[1]}
-        )
-
-        plot1 <- ggplot(plot_data, aes(x={predictor_vars[0]}, y={response_var})) +
-                    geom_point() +
-                    geom_smooth() +
-                    labs(title = "Relation between {predictor_vars[0]} and {response_var}", 
-                         x = "{predictor_vars[0]}", 
-                         y = "{response_var}") +
-                    theme_minimal()
-
-        plot2 <- ggplot(plot_data, aes(x={predictor_vars[0]}, y={response_var}, color = {predictor_vars[1]})) +
-                    geom_point() +
-                    geom_smooth() +
-                    labs(title = "Relation between {predictor_vars[0]} and {response_var}", 
-                         x = "{predictor_vars[0]}", 
-                         y = "{response_var}") +
-                    theme_minimal()
-
-        grid.arrange(plot1, plot2, ncol=1)
-        """
-    else:
-        print("Invalid number of predictor variables provided. The function supports up to 2 predictor variables.")
-
-    r_code += "dev.off()"
-
-    try:
-        # Execute the R code to generate the PDF
-        rpy2.robjects.r(r_code)
-
-        # Verify that the PDF was created
-        pdf_path = './model_plot.pdf'
-        if os.path.exists(pdf_path):
-            print(f"PDF generated successfully: {pdf_path}")
-            
-            # Display the PDF file in the Jupyter notebook
-            if 'google.colab' in str(get_ipython()):
-                print("Scatterplot generated successfully in \
-                      the working directory in 'rplots.pdf'. Download it to view \
-                      the plots.")
-                display(IPython.display.IFrame(pdf_path, width=800, height=600))
-        else:
-            print("PDF file was not generated.")
-
-    except Exception as e:
-        print("Error encountered while generating plots:", e)
 
 
 # Dynamic scatterplot of the relation between two variables
@@ -393,6 +315,7 @@ def dynamic_scatterplot(df_r, response_var, predictor_vars):
                 print("Dynamic scatterplot generated successfully in \
                       the working directory in 'rplots.pdf'. Download it to view \
                       the plots.")
+            else:
                 display(IPython.display.IFrame(pdf_path, width=800, height=600))
         else:
             print("PDF file was not generated.")

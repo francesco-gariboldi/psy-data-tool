@@ -3,6 +3,9 @@ My psychology master thesis project. A semi automatic linear regression models g
 
 ## **Instructions for Use: Software Requirements and Configuration**
 
+Please use the Colab notebook version (psy-data-tool-colab.ipynb) for now. It is simpler to maintain and more widely compatible. Doesn't require any installation.
+When using the Colab notebook version, download the generated r_plots.pdf to see them in your pc.
+
 The program will be available for download on Github.com.
 
 It is my intention to create a software package for the project in the future, so the following configuration steps won't be necessary. For now, the configuration must be done manually and requires the following steps.
